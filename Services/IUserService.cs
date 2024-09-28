@@ -14,4 +14,5 @@ public interface IUserService
     string GenerateJwtToken(User user);
     Task UpdateJwtTokenAsync(int userId, string token);
     Task<RegistrationDto> GetRegInfo(int id);
+    Task<User?> GetUserInfoAsync(int id);
 }

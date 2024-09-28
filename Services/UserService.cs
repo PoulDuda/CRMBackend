@@ -71,6 +71,17 @@ public class UserService : IUserService
         return new LoginResponseDto { JwtToken = token };
     }
 
+    public async Task<User?> GetUserInfoAsync(int id)
+    {
+        var user = await _userRepository.GetUserByIdAsync(id);
+        if (user == null)
+        {
+            return null;
+        }
+
+        return user;
+    }
+    
     public async Task<ApiResponse<UserDto?>> GetUserByIdAsync(int id)
     {
         var user = await _userRepository.GetUserByIdAsync(id);

@@ -102,6 +102,49 @@ public class UserController : ControllerBase
         return CreatedAtAction(nameof(GetUserById), new { id = registratedUser.id }, registratedUser);
     }
 
+    [HttpPost("upload-avatar")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UploadAvatar([FromBody] UploadAvatarDto avatarDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ApiResponse<object>
+            {
+                StatusCode = 400,
+                Message = "Invalid input data",
+                Data = null
+            });
+        }
+        
+        var user = await _userService.GetUserInfoAsync(avatarDto.Id);
+        if (user == null)
+        {
+            return NotFound(new ApiResponse<object>
+            {
+                StatusCode = 404,
+                Message = "User not found",
+                Data = null
+            });
+        }
+
+        var updatedUser = new UpdateUserDto
+        {
+            Name = user.Name,
+            AvatarUrl = avatarDto.AvatarUrl
+        };
+        
+        await _userService.UpdateUserAsync(avatarDto.Id, updatedUser);
+        return Ok(new ApiResponse<object>
+        {
+            StatusCode = 201,
+            Message = "Avatar updated successfully",
+            Data = null
+        });
+    }
+    
     [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
