@@ -6,7 +6,7 @@ public class UserDto
 {
     public string Name { get; set; }
     public string Email { get; set; }
-    public string AvatarUrl { get; set; }
+    public string? AvatarUrl { get; set; }
 }
 
 public class CreateUserDto
@@ -22,7 +22,7 @@ public class CreateUserDto
     [MaxLength(450)]
     public string Password { get; set; }
     [MaxLength(450)]
-    public string AvatarUrl { get; set; }
+    public string? AvatarUrl { get; set; }
 }
 
 public class UpdateUserDto
@@ -30,7 +30,7 @@ public class UpdateUserDto
     [MaxLength(100)]
     public string Name { get; set; }
     [MaxLength(450)]
-    public string AvatarUrl { get; set; }
+    public string? AvatarUrl { get; set; }
     // [EmailAddress]
     // [MaxLength(100)]
     // public string Email { get; set; }

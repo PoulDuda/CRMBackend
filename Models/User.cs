@@ -24,7 +24,7 @@ public class User
     
     [Column("avatar_url")]
     [MaxLength(450)]
-    public string AvatarUrl { get; set; }
+    public string? AvatarUrl { get; set; }
     
     [Column("google_calendar_token")]
     [MaxLength(450)]
@@ -35,4 +35,8 @@ public class User
     
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
+    
+    [Column("jwt_token")]
+    [MaxLength(255)]
+    public string? JwtToken { get; set; }
 }
