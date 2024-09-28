@@ -99,7 +99,7 @@ public class UserController : ControllerBase
         var result = await _userService.CreateUserAsync(user);
         var registratedUser = await _userService.GetRegInfo(result.Data);
         
-        return CreatedAtAction(nameof(GetUserById), new { id = registratedUser.id }, registratedUser);
+        return CreatedAtAction(nameof(GetUserById), new { id = registratedUser.Id }, registratedUser);
     }
 
     [HttpPost("upload-avatar")]

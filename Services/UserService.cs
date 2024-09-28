@@ -44,11 +44,11 @@ public class UserService : IUserService
         var user = await _userRepository.GetUserByIdAsync(id);
         return new RegistrationDto
         {
-            id = user.Id,
-            name = user.Name,
-            avatar_url = user.AvatarUrl,
-            created_at = user.CreatedAt,
-            email = user.Email
+            Id = user.Id,
+            Name = user.Name,
+            AvatarUrl = user.AvatarUrl,
+            CreatedAt= user.CreatedAt,
+            Email= user.Email
         };
     }
     
@@ -122,13 +122,10 @@ public class UserService : IUserService
             };
         }
 
-        if (!string.IsNullOrEmpty(model.Name))
-            user.Name = model.Name;
-
-        if (!string.IsNullOrEmpty(model.AvatarUrl))
-            user.AvatarUrl = model.AvatarUrl;
-
+        user.Name = model.Name ?? user.Name;
+        user.AvatarUrl = model.AvatarUrl ?? user.AvatarUrl;
         user.UpdatedAt = DateTime.UtcNow;
+
         await _userRepository.UpdateUserAsync(user);
 
         return new ApiResponse<bool>
