@@ -1,5 +1,7 @@
-﻿using CRMAuth.Models;
+﻿using System.Security.Claims;
+using CRMAuth.Models;
 using CRMAuth.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRMAuth.Controllers;
@@ -16,45 +18,111 @@ public class UserController : ControllerBase
     }
     
     [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(ApiResponse<UserDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [Produces("application/json")]
     public async Task<IActionResult> GetUserById([FromRoute] int id)
     {
-        var user = await _userService.GetUserByIdAsync(id);
-        if (user == null)
-            return NotFound();
-        return Ok(user);
+        var response = await _userService.GetUserByIdAsync(id);
+        if (response.StatusCode == 404)
+            return NotFound(response);
+        return Ok(response);
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(ApiResponse<List<UserDto>>), StatusCodes.Status200OK)]
+    [Produces("application/json")]
     public async Task<IActionResult> GetAllUsers()
     {
+        
         var users = await _userService.GetAllUsersAsync();
         return Ok(users);
     }
 
     [HttpPost("login")]
+    [Produces("application/json")]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
-        var user = await _userService.GetUserByEmail(loginDto.Email);
-        if (user == null || !_userService.VerifyPassword(loginDto.Password, user.PasswordHash))
+        var user = await _userService.LoginAsync(loginDto);
+        if (user == null)
         {
             return Unauthorized();
         }
 
-        var token = _userService.GenerateJwtToken(user);
-        return Ok(new { Token = token });
+        return Ok(new { Token = user.JwtToken });
+    }
+    
+    [HttpPost("logout")]
+    [Authorize]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Logout()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.Name)?.Value;
+        if (userIdClaim == null)
+        {
+            return Unauthorized(new ApiResponse<object>
+            {
+                StatusCode = 401,
+                Message = "Invalid token",
+                Data = null
+            });
+        }
+
+        var userId = int.Parse(userIdClaim);
+        await _userService.UpdateJwtTokenAsync(userId, null);
+        return Ok(new ApiResponse<object>
+        {
+            StatusCode = 200,
+            Message = "Logout successful",
+            Data = null
+        });
     }
     
     [HttpPost]
+    [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [Produces("application/json")]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserDto user)
     {
-        var userId = await _userService.CreateUserAsync(user);
-        return CreatedAtAction(nameof(GetUserById), new { id = userId }, null);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ApiResponse<object>
+            {
+                StatusCode = 400,
+                Message = "Invalid data",
+                Data = null
+            });
+        }
+
+        var result = await _userService.CreateUserAsync(user);
+        return CreatedAtAction(nameof(GetUserById), new { id = result.Data }, result);
     }
+    
 
     [HttpPut("{id:int}")]
+    [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [Produces("application/json")]
     public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto user)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ApiResponse<object>
+            {
+                StatusCode = 400,
+                Message = "Invalid data",
+                Data = null
+            });
+        }
+
         var result = await _userService.UpdateUserAsync(id, user);
-        return result ? NoContent() : NotFound();
+        if (result.StatusCode == 404)
+        {
+            return NotFound(result);
+        }
+
+        return Ok(result);
     }
 }

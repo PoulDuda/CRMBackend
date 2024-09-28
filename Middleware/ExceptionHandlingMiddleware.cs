@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using CRMAuth.Models;
+using Newtonsoft.Json;
 
 namespace CRMAuth.Middleware;
 
@@ -27,12 +28,13 @@ public class ExceptionHandlingMiddleware
     {
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        var response = new
+        var response = new ApiResponse<object>
         {
             StatusCode = context.Response.StatusCode,
-            Message = "Server internal error. Please, try later!",
-            Detailed = ex.Message // Для отладки можно включить
+            Message = "Server internal error. Please try later!",
+            Data = null
         };
+
         return context.Response.WriteAsync(JsonConvert.SerializeObject(response));
-    } 
+    }
 }

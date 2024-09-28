@@ -16,7 +16,7 @@ public class UserService : IUserService
     {
         _userRepository = userRepository;
     }
-    public async Task<int> CreateUserAsync(CreateUserDto model)
+    public async Task<ApiResponse<int>> CreateUserAsync(CreateUserDto model)
     {
         var user = new User
         {
@@ -25,56 +25,112 @@ public class UserService : IUserService
             Email = model.Email,
             PasswordHash = HashPassword(model.Password),
             AvatarUrl = model.AvatarUrl,
-            // to add
-            // GoogleCalendarToken
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = null
         };
+
         await _userRepository.AddUserAsync(user);
-        return user.Id;
+
+        return new ApiResponse<int>
+        {
+            StatusCode = 201,
+            Message = "User created successfully",
+            Data = user.Id
+        };
+    }
+    
+    public async Task UpdateJwtTokenAsync(int userId, string token)
+    {
+        await _userRepository.UpdateJwtTokenAsync(userId, token);
     }
 
-    public async Task<UserDto?> GetUserByIdAsync(int id)
+    public async Task<LoginResponseDto> LoginAsync(LoginDto loginDto)
+    {
+        var user = await GetUserByEmail(loginDto.Email);
+        if (user == null || !VerifyPassword(loginDto.Password, user.PasswordHash))
+        {
+            return null;
+        }
+
+        var token = GenerateJwtToken(user);
+        await _userRepository.UpdateJwtTokenAsync(user.Id, token);
+
+        return new LoginResponseDto { JwtToken = token };
+    }
+
+    public async Task<ApiResponse<UserDto?>> GetUserByIdAsync(int id)
     {
         var user = await _userRepository.GetUserByIdAsync(id);
-        return user == null ? null : new UserDto { Name = user.Name, Email = user.Email, AvatarUrl = user.AvatarUrl };
-    }
+        if (user == null)
+        {
+            return new ApiResponse<UserDto?>
+            {
+                StatusCode = 404,
+                Message = "User not found",
+                Data = null
+            };
+        }
 
+        return new ApiResponse<UserDto?>
+        {
+            StatusCode = 200,
+            Message = "Success",
+            Data = new UserDto { Name = user.Name, Email = user.Email, AvatarUrl = user.AvatarUrl }
+        };
+    }
+    
     public async Task<User?> GetUserByEmail(string email)
     {
         var users = await _userRepository.GetAllUsersAsync();
         return users.FirstOrDefault(x => x.Email == email);
     }
     
-    public async Task<bool> UpdateUserAsync(int id, UpdateUserDto model)
+    public async Task<ApiResponse<bool>> UpdateUserAsync(int id, UpdateUserDto model)
     {
         var user = await _userRepository.GetUserByIdAsync(id);
-        if (user == null || model is { Name: "string", AvatarUrl: "string" })
-            return false;
-        if (model.Name == "string")
+        if (user == null)
         {
-            user.AvatarUrl = model.AvatarUrl;
-            await _userRepository.UpdateUserAsync(user);
-            return true;
+            return new ApiResponse<bool>
+            {
+                StatusCode = 404,
+                Message = "User not found",
+                Data = false
+            };
         }
-        else
-        {
+
+        if (!string.IsNullOrEmpty(model.Name))
             user.Name = model.Name;
-            await _userRepository.UpdateUserAsync(user);
-            return true;
-        }
+
+        if (!string.IsNullOrEmpty(model.AvatarUrl))
+            user.AvatarUrl = model.AvatarUrl;
+
+        user.UpdatedAt = DateTime.UtcNow;
+        await _userRepository.UpdateUserAsync(user);
+
+        return new ApiResponse<bool>
+        {
+            StatusCode = 200,
+            Message = "User updated successfully",
+            Data = true
+        };
     }
 
-    public async Task<List<UserDto>> GetAllUsersAsync()
+    public async Task<ApiResponse<List<UserDto>>> GetAllUsersAsync()
     {
         var users = await _userRepository.GetAllUsersAsync();
-        return users.Select(user => new UserDto
-            {
-                Name = user.Name,
-                Email = user.Email,
-                AvatarUrl = user.AvatarUrl
-            }
-        ).ToList();
+        var userDtos = users.Select(user => new UserDto
+        {
+            Name = user.Name,
+            Email = user.Email,
+            AvatarUrl = user.AvatarUrl
+        }).ToList();
+
+        return new ApiResponse<List<UserDto>>
+        {
+            StatusCode = 200,
+            Message = "Success",
+            Data = userDtos
+        };
     }
 
     public string GenerateJwtToken(User user)

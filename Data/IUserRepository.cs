@@ -8,4 +8,5 @@ public interface IUserRepository
     Task AddUserAsync(User user);
     Task UpdateUserAsync(User user);
     Task<List<User>> GetAllUsersAsync();
+    Task UpdateJwtTokenAsync(int userId, string token);
 }

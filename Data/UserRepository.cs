@@ -39,6 +39,16 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task UpdateJwtTokenAsync(int userId, string token)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user != null)
+        {
+            user.JwtToken = token;
+            await _context.SaveChangesAsync();
+        }
+    }
+
     public async Task<List<User>> GetAllUsersAsync()
     {
         return await _context.Users.ToListAsync();
