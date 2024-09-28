@@ -17,6 +17,6 @@ COPY --from=build /app/out ./
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ConnectionStrings__DefaultConnection="Host=0.tcp.eu.ngrok.io:10717;Database=root;Username=root;Password=password"
 
-EXPOSE 80
+#EXPOSE 80
 
 ENTRYPOINT ["dotnet", "CRMBackend.dll"]

@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
+﻿
 namespace CRMAuth.Models;
 
 public class ApiResponse<T>
