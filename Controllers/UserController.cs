@@ -80,8 +80,8 @@ public class UserController : ControllerBase
         });
     }
     
-    [HttpPost]
-    [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status201Created)]
+    [HttpPost("register")]
+    [ProducesResponseType(typeof(RegistrationDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
     [Produces("application/json")]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserDto user)
@@ -97,9 +97,10 @@ public class UserController : ControllerBase
         }
 
         var result = await _userService.CreateUserAsync(user);
-        return CreatedAtAction(nameof(GetUserById), new { id = result.Data }, result);
+        var registratedUser = await _userService.GetRegInfo(result.Data);
+        
+        return CreatedAtAction(nameof(GetUserById), new { id = registratedUser.id }, registratedUser);
     }
-    
 
     [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]

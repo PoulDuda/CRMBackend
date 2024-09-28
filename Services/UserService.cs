@@ -38,6 +38,19 @@ public class UserService : IUserService
             Data = user.Id
         };
     }
+
+    public async Task<RegistrationDto> GetRegInfo(int id)
+    {
+        var user = await _userRepository.GetUserByIdAsync(id);
+        return new RegistrationDto
+        {
+            id = user.Id,
+            name = user.Name,
+            avatar_url = user.AvatarUrl,
+            created_at = user.CreatedAt,
+            email = user.Email
+        };
+    }
     
     public async Task UpdateJwtTokenAsync(int userId, string token)
     {

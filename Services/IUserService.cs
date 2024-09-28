@@ -12,5 +12,6 @@ public interface IUserService
     Task<User?> GetUserByEmail(string email);
     bool VerifyPassword(string password, string hashedPassword);
     string GenerateJwtToken(User user);
-    public Task UpdateJwtTokenAsync(int userId, string token);
+    Task UpdateJwtTokenAsync(int userId, string token);
+    Task<RegistrationDto> GetRegInfo(int id);
 }
