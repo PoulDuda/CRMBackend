@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CRMAuth.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/user")]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -32,7 +32,7 @@ public class UserController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(ApiResponse<List<UserDto>>), StatusCodes.Status200OK)]
     [Produces("application/json")]
-    public async Task<IActionResult> GetAllUsers()
+    private async Task<IActionResult> GetAllUsers()
     {
         
         var users = await _userService.GetAllUsersAsync();
