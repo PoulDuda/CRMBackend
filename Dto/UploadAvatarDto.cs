@@ -6,9 +6,7 @@ namespace CRMAuth.Models;
 public class UploadAvatarDto
 {
     [Required]
-    [JsonPropertyName("id")]
-    public int Id { get; set; }
+    public int id { get; set; }
     [Required]
-    [JsonPropertyName("avatar_url")]
-    public string AvatarUrl { get; set; }
+    public string avatar_url { get; set; }
 }

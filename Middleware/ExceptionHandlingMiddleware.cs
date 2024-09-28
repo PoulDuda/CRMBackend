@@ -30,9 +30,9 @@ public class ExceptionHandlingMiddleware
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         var response = new ApiResponse<object>
         {
-            StatusCode = context.Response.StatusCode,
-            Message = "Server internal error. Please try later!",
-            Data = null
+            status_code = context.Response.StatusCode,
+            message = "Server internal error. Please try later!",
+            data = null
         };
 
         return context.Response.WriteAsync(JsonConvert.SerializeObject(response));

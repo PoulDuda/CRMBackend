@@ -5,42 +5,33 @@ namespace CRMAuth.Models;
 
 public class UserDto
 {
-    [JsonProperty("name")]
-    public string Name { get; set; }
-    [JsonProperty("email")]
-    public string Email { get; set; }
-    [JsonProperty("avatar_url", NullValueHandling = NullValueHandling.Ignore)]
-    public string? AvatarUrl { get; set; }
+    public string name { get; set; }
+    public string email { get; set; }
+    public string? avatar_url { get; set; }
 }
 
 public class CreateUserDto
 {
     [Required]
     [MaxLength(100)]
-    [JsonProperty("name")]
-    public string Name { get; set; }
+    public string name { get; set; }
     [Required]
     [EmailAddress]
     [MaxLength(100)]
-    [JsonProperty("email")]
-    public string Email { get; set; }
+    public string email { get; set; }
     [Required]
     [MaxLength(450)]
-    [JsonProperty("password")]
-    public string Password { get; set; }
+    public string password { get; set; }
     [MaxLength(450)]
-    [JsonProperty("avatar_url")]
-    public string? AvatarUrl { get; set; }
+    public string? avatar_url { get; set; }
 }
 
 public class UpdateUserDto
 {
     [MaxLength(100)]
-    [JsonProperty("name")]
-    public string Name { get; set; }
+    public string name { get; set; }
     [MaxLength(450)]
-    [JsonProperty("avatar_url")]
-    public string? AvatarUrl { get; set; }
+    public string? avatar_url { get; set; }
     // [EmailAddress]
     // [MaxLength(100)]
     // public string Email { get; set; }

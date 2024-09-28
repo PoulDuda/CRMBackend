@@ -24,7 +24,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetUserById([FromRoute] int id)
     {
         var response = await _userService.GetUserByIdAsync(id);
-        if (response.StatusCode == 404)
+        if (response.status_code == 404)
             return NotFound(response);
         return Ok(response);
     }
@@ -64,9 +64,9 @@ public class UserController : ControllerBase
         {
             return Unauthorized(new ApiResponse<object>
             {
-                StatusCode = 401,
-                Message = "Invalid token",
-                Data = null
+                status_code = 401,
+                message = "Invalid token",
+                data = null
             });
         }
 
@@ -74,9 +74,9 @@ public class UserController : ControllerBase
         await _userService.UpdateJwtTokenAsync(userId, null);
         return Ok(new ApiResponse<object>
         {
-            StatusCode = 200,
-            Message = "Logout successful",
-            Data = null
+            status_code = 200,
+            message = "Logout successful",
+            data = null
         });
     }
     
@@ -90,16 +90,16 @@ public class UserController : ControllerBase
         {
             return BadRequest(new ApiResponse<object>
             {
-                StatusCode = 400,
-                Message = "Invalid data",
-                Data = null
+                status_code = 400,
+                message = "Invalid data",
+                data = null
             });
         }
 
         var result = await _userService.CreateUserAsync(user);
-        var registratedUser = await _userService.GetRegInfo(result.Data);
+        var registratedUser = await _userService.GetRegInfo(result.data);
         
-        return CreatedAtAction(nameof(GetUserById), new { id = registratedUser.Id }, registratedUser);
+        return CreatedAtAction(nameof(GetUserById), new { id = registratedUser.id }, registratedUser);
     }
 
     [HttpPost("upload-avatar")]
@@ -113,35 +113,35 @@ public class UserController : ControllerBase
         {
             return BadRequest(new ApiResponse<object>
             {
-                StatusCode = 400,
-                Message = "Invalid input data",
-                Data = null
+                status_code = 400,
+                message = "Invalid input data",
+                data = null
             });
         }
         
-        var user = await _userService.GetUserInfoAsync(avatarDto.Id);
+        var user = await _userService.GetUserInfoAsync(avatarDto.id);
         if (user == null)
         {
             return NotFound(new ApiResponse<object>
             {
-                StatusCode = 404,
-                Message = "User not found",
-                Data = null
+                status_code = 404,
+                message = "User not found",
+                data = null
             });
         }
 
         var updatedUser = new UpdateUserDto
         {
-            Name = user.Name,
-            AvatarUrl = avatarDto.AvatarUrl
+            name = user.Name,
+            avatar_url = avatarDto.avatar_url
         };
         
-        await _userService.UpdateUserAsync(avatarDto.Id, updatedUser);
+        await _userService.UpdateUserAsync(avatarDto.id, updatedUser);
         return Ok(new ApiResponse<object>
         {
-            StatusCode = 201,
-            Message = "Avatar updated successfully",
-            Data = null
+            status_code = 201,
+            message = "Avatar updated successfully",
+            data = null
         });
     }
     
@@ -155,14 +155,14 @@ public class UserController : ControllerBase
         {
             return BadRequest(new ApiResponse<object>
             {
-                StatusCode = 400,
-                Message = "Invalid data",
-                Data = null
+                status_code = 400,
+                message = "Invalid data",
+                data = null
             });
         }
 
         var result = await _userService.UpdateUserAsync(id, user);
-        if (result.StatusCode == 404)
+        if (result.status_code == 404)
         {
             return NotFound(result);
         }

@@ -21,10 +21,10 @@ public class UserService : IUserService
         var user = new User
         {
             Id = 0,
-            Name = model.Name,
-            Email = model.Email,
-            PasswordHash = HashPassword(model.Password),
-            AvatarUrl = model.AvatarUrl,
+            Name = model.name,
+            Email = model.email,
+            PasswordHash = HashPassword(model.password),
+            AvatarUrl = model.avatar_url,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = null
         };
@@ -33,9 +33,9 @@ public class UserService : IUserService
 
         return new ApiResponse<int>
         {
-            StatusCode = 201,
-            Message = "User created successfully",
-            Data = user.Id
+            status_code = 201,
+            message = "User created successfully",
+            data = user.Id
         };
     }
 
@@ -44,11 +44,11 @@ public class UserService : IUserService
         var user = await _userRepository.GetUserByIdAsync(id);
         return new RegistrationDto
         {
-            Id = user.Id,
-            Name = user.Name,
-            AvatarUrl = user.AvatarUrl,
-            CreatedAt= user.CreatedAt,
-            Email= user.Email
+            id = user.Id,
+            name = user.Name,
+            avatar_url = user.AvatarUrl,
+            created_at = user.CreatedAt,
+            email = user.Email
         };
     }
     
@@ -89,17 +89,17 @@ public class UserService : IUserService
         {
             return new ApiResponse<UserDto?>
             {
-                StatusCode = 404,
-                Message = "User not found",
-                Data = null
+                status_code = 404,
+                message = "User not found",
+                data = null
             };
         }
 
         return new ApiResponse<UserDto?>
         {
-            StatusCode = 200,
-            Message = "Success",
-            Data = new UserDto { Name = user.Name, Email = user.Email, AvatarUrl = user.AvatarUrl }
+            status_code = 200,
+            message = "Success",
+            data = new UserDto { name = user.Name, email = user.Email, avatar_url = user.AvatarUrl }
         };
     }
     
@@ -116,23 +116,23 @@ public class UserService : IUserService
         {
             return new ApiResponse<bool>
             {
-                StatusCode = 404,
-                Message = "User not found",
-                Data = false
+                status_code = 404,
+                message = "User not found",
+                data = false
             };
         }
 
-        user.Name = model.Name ?? user.Name;
-        user.AvatarUrl = model.AvatarUrl ?? user.AvatarUrl;
+        user.Name = model.name ?? user.Name;
+        user.AvatarUrl = model.avatar_url ?? user.AvatarUrl;
         user.UpdatedAt = DateTime.UtcNow;
 
         await _userRepository.UpdateUserAsync(user);
 
         return new ApiResponse<bool>
         {
-            StatusCode = 200,
-            Message = "User updated successfully",
-            Data = true
+            status_code = 200,
+            message = "User updated successfully",
+            data = true
         };
     }
 
@@ -141,16 +141,16 @@ public class UserService : IUserService
         var users = await _userRepository.GetAllUsersAsync();
         var userDtos = users.Select(user => new UserDto
         {
-            Name = user.Name,
-            Email = user.Email,
-            AvatarUrl = user.AvatarUrl
+            name = user.Name,
+            email = user.Email,
+            avatar_url = user.AvatarUrl
         }).ToList();
 
         return new ApiResponse<List<UserDto>>
         {
-            StatusCode = 200,
-            Message = "Success",
-            Data = userDtos
+            status_code = 200,
+            message = "Success",
+            data = userDtos
         };
     }
 
